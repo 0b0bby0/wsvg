@@ -1,17 +1,39 @@
 #!/usr/bin/env python3
 
-"""
-wsvg.py (Write SVG) - Construct/display SVG scenes.
 
-The following code is a lightweight wrapper around SVG files. The metaphor
-is to construct a scene, add objects to it, and then write it to a file
-to display it.
+#wsvg.py (Write SVG) - Construct/display SVG scenes.
+#
+#The following code is a lightweight wrapper around SVG files. The metaphor
+#is to construct a scene, add objects to it, and then write it to a file
+#to display it.
+#
+#copyright (C) 2014-2017  Martin Engqvist | martin_engqvist@hotmail.com
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#LICENSE:
+#
+#wsvg is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 3 of the License, or
+#(at your option) any later version.
+#
+#wsvg is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU Library General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software Foundation,
+#Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#
+#Isendrak Skatasmid (http://code.activestate.com/recipes/578123-draw-svg-images-in-python-python-recipe-enhanced-v/) 
+#created an enhanced Version of Rick Muller's Code from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
+#This was in turn enhanced by Martin Engqvist.
 
 
-Isendrak Skatasmid (http://code.activestate.com/recipes/578123-draw-svg-images-in-python-python-recipe-enhanced-v/) 
-created an enhanced Version of Rick Muller's Code from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
-This was in turn enhanced by Martin Engqvist.
-"""
+
 
 import os
 import math
