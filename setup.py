@@ -28,15 +28,13 @@ if sys.version_info[0] == 2:
     
 setup(
 	name='wsvg',    # This is the name of your PyPI-package.
-	description='A script to deal with color conversions, color transformations, and generating color scales.',       #package description
-	version='0.1.0',                          # Update the version number for new releases
-#	scripts=['colcol.py'],                  # The name of your scipt, and also the command you'll be using for calling it
+	description='A lightweight wrapper around the SVG format to script SVG files.',       #package description
+	version='0.1.1',                          # Update the version number for new releases
 	author='Martin Engqvist',
 	author_email='martin_engqvist@hotmail.com',
 	url='https://github.com/mengqvist/wsvg',
 	license='GPLv3+',
-	install_requires=[
-		  'colcol',],
+	install_requires=['colcol'],
 	classifiers=[
 	# How mature is this project? Common values are
 	#   3 - Alpha
