@@ -34,7 +34,7 @@ setup(
 	author_email='martin_engqvist@hotmail.com',
 	url='https://github.com/mengqvist/wsvg',
 	license='GPLv3+',
-	install_requires=['colcol'],
+	install_requires=[],
 	classifiers=[
 	# How mature is this project? Common values are
 	#   3 - Alpha

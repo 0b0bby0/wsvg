@@ -38,7 +38,6 @@
 import os
 import math
 import re
-import colcol
 
 
 
@@ -400,12 +399,62 @@ class Text:
 
 
 
+
+
+def is_rgb(in_col):
+	'''
+	Check whether input is a valid RGB color.
+	Return True if it is, otherwise False.
+	'''
+	if len(in_col) == 3 and type(in_col) == tuple:
+		if type(in_col[0]) is int and type(in_col[1]) and type(in_col[2]) and 0<=in_col[0]<=255 and 0<=in_col[1]<=255 and 0<=in_col[2]<=255:
+			return True
+		else:
+			return False
+	else:
+		return False
+
+
+def is_hex(in_col):
+	'''
+	Check whether an input string is a valid hex value.
+	Return True if it is, otherwise False.
+	'''
+	if type(in_col) is not str:
+		return False
+
+	regular_expression = re.compile(r'''^ #match beginning of string
+					[#]{1} #exactly one hash
+					[0-9a-fA-F]{6}	#exactly six of the hex symbols  0 to 9, a to f (big or small)
+					$ #match end of string
+					''', re.VERBOSE)
+
+	if regular_expression.match(in_col) == None:
+		return False
+	else:
+		return True
+
+
+def rgb_to_hex(rgb):
+	'''
+	Convert RGB colors to hex.
+	Input should be a tuple of integers (R, G, B) where each is between 0 and 255.
+	Output is a string representing a hex numer. For instance '#FFFFFF'.
+	'''
+	#make sure input is ok
+	assert is_rgb(rgb) is True, 'Error, %s is not a valid RGB color.' % rgb
+
+	#make conversion
+	return "#%02x%02x%02x".lower() % rgb
+
+
+
 def colorstr(input):
 	'''Convert RGB colors to hex, if needed''' 
-	if colcol.is_hex(input): #if it is hex, return it
+	if is_hex(input): #if it is hex, return it
 		return input
-	elif colcol.is_rgb(input): #if it not hex, but is RGB, convert it
-		return colcol.rgb_to_hex(input)
+	elif is_rgb(input): #if it not hex, but is RGB, convert it
+		return rgb_to_hex(input)
 	else:
 		raise ValueError
 
