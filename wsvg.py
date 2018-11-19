@@ -28,7 +28,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #
-#Isendrak Skatasmid (http://code.activestate.com/recipes/578123-draw-svg-images-in-python-python-recipe-enhanced-v/) 
+#Isendrak Skatasmid (http://code.activestate.com/recipes/578123-draw-svg-images-in-python-python-recipe-enhanced-v/)
 #created an enhanced Version of Rick Muller's Code from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
 #This was in turn enhanced by Martin Engqvist.
 
@@ -38,6 +38,7 @@
 import os
 import math
 import re
+from colcol import convert
 
 
 
@@ -46,17 +47,17 @@ class Scene:
         self.name = name
         self.items = []
         self.size = size
-        self.height = size[0]
-        self.width = size[1]
+        self.width = size[0]
+        self.height = size[1]
         return
 
-    def add(self,item): 
+    def add(self,item):
         self.items.append(item)
 
     def strarray(self):
         var = ["<?xml version=\"1.0\"?>\n",
                '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="%r" width="%r" >\n' % (self.height,self.width)]
-        for item in self.items: var += item.strarray()            
+        for item in self.items: var += item.strarray()
         var += ["</svg>\n"]
         return var
 
@@ -64,7 +65,7 @@ class Scene:
         if filename:
             self.svgname = filename
         else:
-            self.svgname = self.name + ".svg"
+            self.svgname = self.name
         file = open(self.svgname,'w')
         file.writelines(self.strarray())
         file.close()
@@ -94,20 +95,23 @@ class Group:
 
 
 class Line:
-    def __init__(self, start, end, color, width):
+    def __init__(self, start, end, line_color='#000000', line_width=1, linecap='butt', linejoin='miter', lineopacity=1, ID='path001'):
         self.start = start
         self.end = end
-        self.color = color
-        self.width = width
+        self.color = line_color
+        self.width = line_width
+        self.linecap = linecap
+        self.linejoin = linejoin
+        self.lineopacity = lineopacity
         return
 
     def strarray(self):
         return ["  <line x1=\"%r\" y1=\"%r\" x2=\"%r\" y2=\"%r\"\n" % (self.start[0],self.start[1],self.end[0],self.end[1]),
-    			"    style=\"stroke:%s;stroke-width:%r\"/>\n" % (colorstr(self.color),self.width)]
+    			"    style=\"stroke:%s;stroke-width:%rpx;stroke-linecap:%s;stroke-linejoin:%s;stroke-opacity:%s\"/>\n" % (colorstr(self.color), self.width, self.linecap, self.linejoin, self.lineopacity)]
 
 
 class ControlLine:
-	def __init__(self, start, end, control1, control2, line_color=(0,0,0), fill_color='none', width=1, linecap = 'butt', linejoin='miter', lineopacity=1, ID='path001'):
+	def __init__(self, start, end, control1, control2, line_color='#000000', fill_color='none', line_width=1, linecap = 'butt', linejoin='miter', lineopacity=1, ID='path001'):
 		self.start = start
 		self.end = end
 		self.control1 = control1
@@ -127,7 +131,7 @@ class ControlLine:
 		else:
 			self.fill_color = colorstr(fill_color)
 
-		self.line_width = width
+		self.line_width = line_width
 
 
 	def strarray(self):
@@ -138,10 +142,54 @@ class ControlLine:
 				'    id="%s"/>\n' % (self.id)]
 
 
-#def PolyLine:
+class PolyLine:
+	def __init__(self, points, line_color=(0,0,0), fill_color='none', line_width=1, linecap = 'butt', linejoin='miter', lineopacity=1, ID='path001'):
+		self.points = points
+		self.linecap = linecap
+		self.linejoin = linejoin
+		self.lineopacity = lineopacity
+		self.id = ID
+
+		if line_color == 'none':
+			self.line_color = line_color
+		else:
+			self.line_color = colorstr(line_color)
+
+		if fill_color == 'none':
+			self.fill_color = fill_color
+		else:
+			self.fill_color = colorstr(fill_color)
+
+		self.line_width = line_width
+
+		# assemble the line list
+		self.line_point_list = ['m']
+		self.start_x = None
+		self.start_y = None
+		for x,y in self.points:
+			if self.start_x is None:
+				self.start_x = x
+				self.start_y = y
+				x_val = x
+				y_val = y
+			else:
+				x_val = x - self.start_x
+				y_val = y - self.start_y
+			self.start_x = x
+			self.start_y = y
+			self.line_point_list.append('%s,%s' % (x_val, y_val))
+
+
+	def strarray(self):
+
+		return ['  <path \n',
+				'    style="fill:%s;stroke:%s;stroke-width:%rpx;stroke-linecap:%s;stroke-linejoin:%s;stroke-opacity:%s"\n' % (self.fill_color, self.line_color, self.line_width, self.linecap, self.linejoin, self.lineopacity),
+				'    d="%s"\n' % ' '.join(self.line_point_list),
+				'    id="%s"/>\n' % (self.id)]
+
 
 #def ControlPolyLine:
-		
+
 
 class Circle:
     def __init__(self, center, radius, fill_color, line_color, line_width):
@@ -184,7 +232,7 @@ class Polygon:
 				"    style=\"fill:%s;stroke:%s;stroke-width:%r\"/>\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
 
 class Rectangle:
-    def __init__(self,origin,height,width,fill_color,line_color,line_width):
+    def __init__(self, origin, height, width, fill_color, line_color, line_width):
         self.origin = origin
         self.height = height
         self.width = width
@@ -223,11 +271,11 @@ class Arc:
 
 			#empirically the bezier length is about 0.35 of the arc length (an arc is maximally 1/4 of a circle)
 			#more accurately it seems to be (1.104568/pi)*a	    where a is the arc length
-			bezier_length =  (1.104568/math.pi)*(radius*2*math.pi)*(ang_increment/360.0) 
+			bezier_length =  (1.104568/math.pi)*(radius*2*math.pi)*(ang_increment/360.0)
 
-			#I need to calculate where the beziers go. These are basically defined length tangents of a circle 
+			#I need to calculate where the beziers go. These are basically defined length tangents of a circle
 			#the radius of the circle is adjacent
-			#the bezier length is opposite	
+			#the bezier length is opposite
 			#z is the radius of a new circle on which the bezier point lies
 			z = math.sqrt(math.pow(radius,2) + math.pow(bezier_length,2)) #determine length of z (the hypotenuse)
 
@@ -241,7 +289,7 @@ class Arc:
 			x1, y1 = PolarToCartesian(self.origin[0], self.origin[1], z, angle-ang_increment+degrees) #bezier on previous point
 			x2, y2 = PolarToCartesian(self.origin[0], self.origin[1], z, angle-degrees) #bezier on previous point
 			path += "%r,%r %r,%r %r,%r " % (x1, y1, x2, y2, x, y) #c is curve in the form (x1 y1 x2 y2 x y). Draws line from current point to xy. Uses x1 y1 and x2 y2 as control points for beziers.
-		return path	
+		return path
 
 
 	def makeRevArc(self, radius):
@@ -258,11 +306,11 @@ class Arc:
 
 			#empirically the bezier length is about 0.35 of the arc length (an arc is maximally 1/4 of a circle)
 			#more accurately it seems to be (1.104568/pi)*a	    where a is the arc length
-			bezier_length =  (1.104568/math.pi)*(radius*2*math.pi)*(ang_increment/360.0) 
+			bezier_length =  (1.104568/math.pi)*(radius*2*math.pi)*(ang_increment/360.0)
 
-			#I need to calculate where the beziers go. These are basically defined length tangents of a circle 
+			#I need to calculate where the beziers go. These are basically defined length tangents of a circle
 			#the radius of the circle is adjacent
-			#the bezier length is opposite	
+			#the bezier length is opposite
 			#z is the radius of a new circle on which the bezier point lies
 			z = math.sqrt(math.pow(radius,2) + math.pow(bezier_length,2)) #determine length of z (the hypotenuse)
 
@@ -276,22 +324,22 @@ class Arc:
 			x1, y1 = PolarToCartesian(self.origin[0], self.origin[1], z, angle-ang_increment+degrees) #bezier on previous point
 			x2, y2 = PolarToCartesian(self.origin[0], self.origin[1], z, angle-degrees) #bezier on previous point
 			path += "%r,%r %r,%r %r,%r " % (x1, y1, x2, y2, x, y) #c is curve in the form (x1 y1 x2 y2 x y). Draws line from current point to xy. Uses x1 y1 and x2 y2 as control points for beziers.
-		return path			
+		return path
 
 	def strarray(self):
 		arc_path = 'd="' #for storing the points when drawing the arc
-		
+
 		angle = self.end_ang
 		x, y = PolarToCartesian(self.origin[0], self.origin[1], self.radius, angle)
 		arc_path += "M %r,%r " % (x, y) #m is moveto, basically lift pen and start as designated point
-		arc_path += "C " #C for 
+		arc_path += "C " #C for
 		arc_path += self.makeArc(self.radius) #make the actual points and beziers
 
 		if self.start_ang == self.end_ang or self.start_ang == self.end_ang-360: #complete circle
 			arc_path += ' z "\n'
 		else:
 			arc_path += '"\n'
-		
+
 
 		return ["  <path %s" % arc_path,
 				"    style=\"fill:%s;stroke:%s;stroke-width:%r\"/>\n" % (colorstr(self.fill_color), colorstr(self.line_color), self.line_width)]
@@ -346,15 +394,15 @@ class DoubleArc(Arc):
 
 			x, y = PolarToCartesian(self.origin[0], self.origin[1], self.radius+self.width, self.end_ang)
 			arc_path += "L %r,%r " % (x, y) #draw line to end of outer arc
-			
+
 			outer_arc = "C " + self.makeRevArc(self.radius+self.width) #draw the points and beziers of the outer arc in reverse
 			arc_path += outer_arc  #add outer arc
 			arc_path += 'z"\n' #close it
-			
+
 		return ["  <path %s" % arc_path,
 				"    style=\"fill:%s;stroke:%s;stroke-width:%r\"/>\n" % (colorstr(self.fill_color), colorstr(self.line_color), self.line_width)]
 
-		
+
 
 class Text:
 	'''Draws rotated text with the top (12 on a clock) being 0 degrees'''
@@ -370,8 +418,8 @@ class Text:
 		self.stretch = stretch
 		self.height = height
 		self.lspacing = lspacing
-		self.wspacing = wspacing 
-		self.opacity = opacity 
+		self.wspacing = wspacing
+		self.opacity = opacity
 		self.stroke = stroke
 		self.family = family
 		self.anchor = anchor
@@ -395,75 +443,20 @@ class Text:
 					(self.origin[0], self.origin[1], self.anchor, self.align, self.angle, self.origin[0], self.origin[1]),
 					"    style=\"font-size:%spx;font-style:%s;font-variant:%s;font-weight:%s;font-stretch:%s;line-height:%s%%;letter-spacing:%spx;word-spacing:%spx;fill:%s;fill-opacity:%s;stroke:%s;font-family:%s\">\n" %\
 					(self.size, self.style, self.variant, self.weight, self.stretch, self.height, self.lspacing, self.wspacing, colorstr(self.color), self.opacity, self.stroke, self.family),
-					"    %s</text>\n" % self.text]			
+					"    %s</text>\n" % self.text]
 
 
 
+def colorstr(input_color):
+	'''Convert RGB colors to hex, if needed'''
+	if str(input_color).lower() == 'none':
+	    return 'none'
+	if type(input_color) is tuple or type(input_color) is str:
+	    input_color = convert.Color(input_color)
+	return input_color.hex()
 
 
-def is_rgb(in_col):
-	'''
-	Check whether input is a valid RGB color.
-	Return True if it is, otherwise False.
-	'''
-	if len(in_col) == 3 and type(in_col) == tuple:
-		if type(in_col[0]) is int and type(in_col[1]) and type(in_col[2]) and 0<=in_col[0]<=255 and 0<=in_col[1]<=255 and 0<=in_col[2]<=255:
-			return True
-		else:
-			return False
-	else:
-		return False
-
-
-def is_hex(in_col):
-	'''
-	Check whether an input string is a valid hex value.
-	Return True if it is, otherwise False.
-	'''
-	if type(in_col) is not str:
-		return False
-
-	regular_expression = re.compile(r'''^ #match beginning of string
-					[#]{1} #exactly one hash
-					[0-9a-fA-F]{6}	#exactly six of the hex symbols  0 to 9, a to f (big or small)
-					$ #match end of string
-					''', re.VERBOSE)
-
-	if regular_expression.match(in_col) == None:
-		return False
-	else:
-		return True
-
-
-def rgb_to_hex(rgb):
-	'''
-	Convert RGB colors to hex.
-	Input should be a tuple of integers (R, G, B) where each is between 0 and 255.
-	Output is a string representing a hex numer. For instance '#FFFFFF'.
-	'''
-	#make sure input is ok
-	assert is_rgb(rgb) is True, 'Error, %s is not a valid RGB color.' % rgb
-
-	#make conversion
-	return "#%02x%02x%02x".lower() % rgb
-
-
-
-def colorstr(input):
-	'''Convert RGB colors to hex, if needed''' 
-	if is_hex(input): #if it is hex, return it
-		return input
-	elif is_rgb(input): #if it not hex, but is RGB, convert it
-		return rgb_to_hex(input)
-	else:
-		raise ValueError
-
-
-
-
-	
-
-def PolarToCartesian(centre_x, centre_y, radius, angle):	
+def PolarToCartesian(centre_x, centre_y, radius, angle):
 	'''Takes the centre of a circle, an angle (in degrees) and a radius and calculates the correspoinding XY coordinate on the circle'''
 	assert type(centre_x) is int and type(centre_y) is int, 'Error, the input coordinates need to be integers.'
 	assert (type(angle) is int or type(angle) is float) and (type(radius) is int or type(radius) is float), 'Error, the input angle and radius need to be integers or floats.'
@@ -486,18 +479,18 @@ def test():
 	scene.add(Ellipse((300,300), 40, 25, (255,0,255),(0,255,0),1))
 	scene.add(Arc(origin=(10,10), radius=50, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), line_width=3))
 	scene.add(Arc(origin=(100,100), radius=15, start_ang=1, end_ang=89, fill_color=(0,0,0), line_color=(255,0,0), line_width=3))
-	scene.add(DoubleArc(origin=(100,200), radius=0, width=14, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), line_width=0))
-	scene.add(DoubleArc(origin=(100,300), radius=15, width=14, start_ang=190, end_ang=200, fill_color=(0,0,0), line_color=(255,0,0), line_width=0))
-	scene.add(DoubleArc(origin=(200,100), radius=15, width=5, start_ang=0, end_ang=360, fill_color=(0,0,0), line_color=(255,0,0), line_width=0))
+	scene.add(DoubleArc(origin=(100,200), radius=0, line_width=14, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), width=0))
+	scene.add(DoubleArc(origin=(100,300), radius=15, line_width=14, start_ang=190, end_ang=200, fill_color=(0,0,0), line_color=(255,0,0), width=0))
+	scene.add(DoubleArc(origin=(200,100), radius=15, line_width=5, start_ang=0, end_ang=360, fill_color=(0,0,0), line_color=(255,0,0), width=0))
 
-	scene.add(ControlLine(start=(0,150), end=(300,300), control1=(300,150), control2=(0,300), line_color=(255,0,0), width=5, ID='path099101'))
+	scene.add(ControlLine(start=(0,150), end=(300,300), control1=(300,150), control2=(0,300), line_color=(255,0,0), line_width=5, ID='path099101'))
 	scene.add(Text(text="Setting text on path", origin=(50,70), angle=0, size=24, color=(0,0,0), anchor="middle", onpath='path099101')) #put text on path
 
 
 	for r in range(0, 360, 45):
-		scene.add(Text(text="Testing rotated", origin=(350,350), angle=r, size=15, color=(abs(r)/2,255-abs(r)/2,0), anchor="end"))	
+		scene.add(Text(text="Testing rotated", origin=(350,350), angle=r, size=15, color=(abs(r)/2,255-abs(r)/2,0), anchor="end"))
 	scene.write_svg()
 	return
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
 	test()
