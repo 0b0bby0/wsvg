@@ -325,13 +325,17 @@ class Color:
 
 
 		#make sure the input color is valid
-		assert (is_rgb(in_col) or is_hex(in_col) or ((type(in_col) is str) and (in_col.lower() in self.colors.keys()))), 'Error, the input color "%s" is not a valid rgb color, hex color or named color' % str(in_col)
+		if is_rgb(in_col):
+			self._set_color(in_col)
 
-		if is_rgb(in_col) is False and is_hex(in_col) is False and in_col.lower() in self.colors.keys() is True:
-			in_col = self.colors[in_col.lower()]
+		elif is_hex(in_col):
+			self._set_color(in_col)
 
-		#set variables
-		self._set_color(in_col)
+		elif ((type(in_col) is str) and (in_col.lower() in self.colors.keys())):
+			self._set_color(self.colors[in_col.lower()])
+		else:
+			raise ValueError('Error, the input color "%s" is not a valid rgb color, hex color or named color' % str(in_col))
+		
 
 
 	def __str__(self):

@@ -29,7 +29,7 @@ if sys.version_info[0] == 2:
 setup(
 	name='wsvg',    # This is the name of your PyPI-package.
 	description='A lightweight wrapper around the SVG format to script SVG files.',       #package description
-	version='0.1.2',                          # Update the version number for new releases
+	version='0.1.3',                          # Update the version number for new releases
 	author='Martin Engqvist',
 	author_email='martin_engqvist@hotmail.com',
 	url='https://github.com/mengqvist/wsvg',
