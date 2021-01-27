@@ -36,40 +36,40 @@ The library works by first creating a scene. Different lines and shapes are then
 ```
 
 
-The basic shapes that can be added to a scen include the following:
+The basic shapes that can be added to a scene include the following:
 ```Python3
 >>> svg.Rectangle(origin=(100,100),
-        height=200,
-        width=200,
-        fill_color=(0,255,255),
-        line_color=(0,0,0),
-        line_width=1)
+          height=200,
+          width=200,
+          fill_color=(0,255,255),
+          line_color=(0,0,0),
+          line_width=1)
 >>> svg.Polygon(points=[(5,5),(5,10),(15,10),(20,20)],
-        fill_color='slate',
-        line_color='pink',
-        line_width=1)
+          fill_color='darkslateblue',
+          line_color='hotpink',
+          line_width=1)
 >>> svg.PolyLine(points=[(5,5),(5,10),(15,10),(20,20)],
-        line_color='#000000',
-        closed=False,
-        fill_color='none',
-        line_width=1,
-        linecap = 'butt',
-        linejoin='miter',
-        lineopacity=1,
-        ID='path001')
+          line_color='#000000',
+          closed=False,
+          fill_color='none',
+          line_width=1,
+          linecap ='butt',
+          linejoin='miter',
+          lineopacity=1,
+          ID='path001')
 >>> svg.Line(start=(200,200),
-        end=(200,300),
-        line_color=(0,0,0),
-        line_width=1,
-        linecap='butt',
-        linejoin='miter',
-        lineopacity=1,
-        ID='path001')
+          end=(200,300),
+          line_color=(0,0,0),
+          line_width=1,
+          linecap='butt',
+          linejoin='miter',
+          lineopacity=1,
+          ID='path001')
 >>> svg.Circle(center=(200,200),
-        radius=30,
-        fill_color=(0,0,255),
-        line_color=(0,0,0),
-        line_width=1)
+          radius=30,
+          fill_color=(0,0,255),
+          line_color=(0,0,0),
+          line_width=1)
 >>> svg.Text(text="Normal",
           origin=(50,50),
           angle=0,
