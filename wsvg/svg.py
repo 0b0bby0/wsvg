@@ -44,7 +44,7 @@ from wsvg import convert
 
 class Scene:
     def __init__(self, name="svg", size=(400,400)):
-        self.name = name
+        self.name = name if name.lower().endswith('.svg') else name + '.svg'
         self.items = []
         self.size = size
         self.width = size[0]
@@ -75,7 +75,7 @@ class Scene:
 
 class Group:
 	'''Group all svg objects from a list and add to file.'''
-	def __init__(self, ID, elements):
+	def __init__(self, elements, ID):
 		self.ID = ID
 		self.elements = elements
 		return
