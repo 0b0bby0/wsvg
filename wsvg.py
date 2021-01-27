@@ -7,7 +7,7 @@
 #is to construct a scene, add objects to it, and then write it to a file
 #to display it.
 #
-#copyright (C) 2014-2017  Martin Engqvist | martin_engqvist@hotmail.com
+#copyright (C) 2014-2021  Martin Engqvist | martin_engqvist@hotmail.com
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #LICENSE:
@@ -30,7 +30,7 @@
 #
 #Isendrak Skatasmid (http://code.activestate.com/recipes/578123-draw-svg-images-in-python-python-recipe-enhanced-v/)
 #created an enhanced Version of Rick Muller's Code from http://code.activestate.com/recipes/325823-draw-svg-images-in-python/
-#This was in turn enhanced by Martin Engqvist.
+#This was in turn extended and enhanced by Martin Engqvist.
 
 
 
@@ -38,7 +38,7 @@
 import os
 import math
 import re
-from colcol import convert
+import convert
 
 
 
@@ -143,12 +143,13 @@ class ControlLine:
 
 
 class PolyLine:
-	def __init__(self, points, line_color=(0,0,0), fill_color='none', line_width=1, linecap = 'butt', linejoin='miter', lineopacity=1, ID='path001'):
+	def __init__(self, points, line_color='#000000', closed=False, fill_color='none', line_width=1, linecap = 'butt', linejoin='miter', lineopacity=1, ID='path001'):
 		self.points = points
 		self.linecap = linecap
 		self.linejoin = linejoin
 		self.lineopacity = lineopacity
 		self.id = ID
+		self.closed = closed
 
 		if line_color == 'none':
 			self.line_color = line_color
@@ -179,6 +180,9 @@ class PolyLine:
 			self.start_y = y
 			self.line_point_list.append('%s,%s' % (x_val, y_val))
 
+		# is the line closed or open?
+		if self.closed is True:
+			self.line_point_list.append(' z')
 
 	def strarray(self):
 
@@ -449,10 +453,14 @@ class Text:
 
 def colorstr(input_color):
 	'''Convert RGB colors to hex, if needed'''
-	if str(input_color).lower() == 'none':
-	    return 'none'
-	if type(input_color) is tuple or type(input_color) is str:
-	    input_color = convert.Color(input_color)
+	if type(input_color) is tuple:
+		input_color = convert.Color(input_color)
+
+	elif type(input_color) is str:
+			if str(input_color).lower() == 'none':
+				return 'none'
+			else:
+				input_color = convert.Color(input_color)
 	return input_color.hex()
 
 
@@ -468,7 +476,7 @@ def PolarToCartesian(centre_x, centre_y, radius, angle):
 
 def test():
 	'''Example usage'''
-	scene = Scene("test", size=(400,400))
+	scene = Scene("test.svg", size=(400,400))
 	scene.add(Rectangle((100,100),200,200,(0,255,255),(0,0,0),1))
 	scene.add(Polygon([(5,5),(5,10),(15,10),(20,20)], (0,255,255),(0,0,0),1))
 	scene.add(Line((200,200),(200,300),(0,0,0),1))
@@ -479,7 +487,7 @@ def test():
 	scene.add(Ellipse((300,300), 40, 25, (255,0,255),(0,255,0),1))
 	scene.add(Arc(origin=(10,10), radius=50, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), line_width=3))
 	scene.add(Arc(origin=(100,100), radius=15, start_ang=1, end_ang=89, fill_color=(0,0,0), line_color=(255,0,0), line_width=3))
-	scene.add(DoubleArc(origin=(100,200), radius=0, line_width=14, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), width=0))
+	scene.add(DoubleArc(origin=(100,200), radius=20, line_width=14, start_ang=0, end_ang=90, fill_color=(0,0,0), line_color=(255,0,0), width=0))
 	scene.add(DoubleArc(origin=(100,300), radius=15, line_width=14, start_ang=190, end_ang=200, fill_color=(0,0,0), line_color=(255,0,0), width=0))
 	scene.add(DoubleArc(origin=(200,100), radius=15, line_width=5, start_ang=0, end_ang=360, fill_color=(0,0,0), line_color=(255,0,0), width=0))
 
@@ -488,7 +496,7 @@ def test():
 
 
 	for r in range(0, 360, 45):
-		scene.add(Text(text="Testing rotated", origin=(350,350), angle=r, size=15, color=(abs(r)/2,255-abs(r)/2,0), anchor="end"))
+		scene.add(Text(text="Testing rotated", origin=(350,350), angle=r, size=15, color=(int(abs(r)/2),int(255-abs(r)/2),0), anchor="end"))
 	scene.write_svg()
 	return
 
