@@ -38,7 +38,7 @@
 import os
 import math
 import re
-import convert
+from wsvg import convert
 
 
 

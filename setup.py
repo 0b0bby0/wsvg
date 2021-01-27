@@ -18,7 +18,7 @@
 #Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 import sys
@@ -29,18 +29,19 @@ if sys.version_info[0] == 2:
 setup(
 	name='wsvg',    # This is the name of your PyPI-package.
 	description='A lightweight wrapper around the SVG format to script SVG files.',       #package description
-	version='0.1.1',                          # Update the version number for new releases
+	version='0.1.2',                          # Update the version number for new releases
 	author='Martin Engqvist',
 	author_email='martin_engqvist@hotmail.com',
 	url='https://github.com/mengqvist/wsvg',
 	license='GPLv3+',
+	packages=find_packages(exclude=['contrib', 'docs', 'tests*']), #find folders containing scripts, exclude irrelevant ones
 	install_requires=[],
 	classifiers=[
 	# How mature is this project? Common values are
 	#   3 - Alpha
 	#   4 - Beta
 	#   5 - Production/Stable
-	'Development Status :: 3 - Alpha',
+	'Development Status :: 5 - Production/Stable',
 
 	# Indicate who your project is intended for
 	'Intended Audience :: Science/Research',
